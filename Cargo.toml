@@ -2,6 +2,11 @@
 name = "mozversion"
 version = "0.1.0"
 authors = ["James Graham <james@hoppipolla.co.uk>"]
+description = "Utility for accessing Firefox version metadata"
+keywords = ["mozilla", "firefox"]
+repository = "https://github.com/jgraham/mozversion"
+license = "MPL-2.0"
+
 
 [dependencies]
 regex = "0.2"
