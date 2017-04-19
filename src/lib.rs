@@ -200,8 +200,6 @@ pub fn firefox_version(binary: &Path) -> Result<AppVersion, Error>  {
     Ok(version)
 }
 
-
-
 #[derive(Debug)]
 pub enum Error {
     /// Error parsing a version string
