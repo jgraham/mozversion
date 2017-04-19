@@ -4,6 +4,7 @@ extern crate semver;
 
 use ini::Ini;
 use regex::Regex;
+use platform::ini_path;
 use std::default::Default;
 use std::error;
 use std::fmt::{self, Display, Formatter};
@@ -167,10 +168,8 @@ pub fn firefox_version(binary: &Path) -> Result<AppVersion, Error>  {
     let mut version = AppVersion::new();
     let mut updated = false;
 
-    if let Some(dir) = binary.parent() {
-        let ini_path = dir.to_path_buf();
-
-        let mut application_ini = ini_path.clone();
+    if let Some(dir) = ini_path(binary) {
+        let mut application_ini = dir.clone();
         application_ini.push("application.ini");
 
         if Path::exists(&application_ini) {
@@ -181,7 +180,7 @@ pub fn firefox_version(binary: &Path) -> Result<AppVersion, Error>  {
             }
         }
 
-        let mut platform_ini = ini_path.clone();
+        let mut platform_ini = dir.clone();
         platform_ini.push("platform.ini");
 
         if Path::exists(&platform_ini) {
@@ -200,6 +199,8 @@ pub fn firefox_version(binary: &Path) -> Result<AppVersion, Error>  {
     }
     Ok(version)
 }
+
+
 
 #[derive(Debug)]
 pub enum Error {
@@ -250,6 +251,24 @@ impl error::Error for Error {
             &Error::SemVerError(ref e) => Some(e),
             _ => None,
         }
+    }
+}
+
+#[cfg(target_os = "macos")]
+mod platform {
+    use std::path::{Path, PathBuf};
+
+    pub fn ini_path(binary: &Path) -> Option<PathBuf> {
+        binary.parent().and_then(|x| x.parent()).map(|x| x.join("Resources"))
+    }
+}
+
+#[cfg(not(target_os = "macos"))]
+mod platform {
+    use std::path::{Path, PathBuf};
+
+    pub fn ini_path(binary: &Path) -> Option<PathBuf> {
+        binary.parent().map(|dir| dir.to_path_buf())
     }
 }
 
